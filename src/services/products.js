@@ -1,7 +1,7 @@
 import { get,post,put,del } from "../utils/request";
 
 export function listApi(page = 1){
-    return get('/api/v1/admin/products',{page})
+    return get('/api/v1/admin/products',{page,per:2})
 }
 
 export function createApi(data){
@@ -9,9 +9,13 @@ export function createApi(data){
 }
 
 export function modifyOne(id,data){
-    return put('/api/v1/admin/products/${id}',data)
+    return put(`/api/v1/admin/products/${id}`,data)
 }
 
 export function deleteOne(id){
-    return del('/api/v1/admin/products/${id}')
+    return del(`/api/v1/admin/products/${id}`)
+}
+
+export function getOnebyId(id){
+    return get(`/api/v1/admin/products/${id}`)
 }
