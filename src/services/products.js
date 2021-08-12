@@ -1,7 +1,7 @@
 import { get,post,put,del } from "../utils/request";
 
 export function listApi(page = 1){
-    return get('/api/v1/admin/products',{page,per:2})
+    return get('/api/v1/admin/products',{page,per:4})
 }
 
 export function createApi(data){

@@ -1,6 +1,7 @@
 import React, {useEffect,useState} from 'react'
 import { Card, Table, Button, Popconfirm } from 'antd' 
-import { listApi } from '../../../services/products'
+import { listApi,deleteOne,modifyOne } from '../../../services/products'
+import './List.css'
 
 export default function List(props) {
     // const dataSource = [{
@@ -16,15 +17,17 @@ export default function List(props) {
     //     name:"p3",
     //     price:2.5
     // }]
-
+    
     const [dataSource, setDataSource] = useState([])
     const [total,setTotal] = useState(0)
+    const [currentPage, setCurrentPage] = useState(1)
 
     const loadData = (page) =>{
         listApi(page)
         .then(res=>{
             setDataSource(res.products)
             setTotal(res.totalCount)
+            setCurrentPage(page)
         })
     }
 
@@ -52,6 +55,11 @@ export default function List(props) {
         title:'Product Price',
         dataIndex:'price',
     },{
+        title:"On the Market",
+        dataIndex:"OnSale",
+        render:(text,record) => (record.onSale ? "Yes" : "No")
+    },
+    {
         title:'Action',
         render:(txt, record, index) =>{
             return(
@@ -66,14 +74,34 @@ export default function List(props) {
                     </Button>
                     <Popconfirm 
                     title="Are you sure to delete this?"
-                    onConfirm={()=>console.log()}
+                    onConfirm={ () => {
+                        deleteOne(record._id)
+                            .then(res=>{
+                                loadData(currentPage)
+                            })
+                        } 
+                    }
                     onCancel={()=>console.log()}
                     >
-                        <Button type="danger"size="small" style={{margin: "0 1rem"}}>
+                        <Button 
+                            type="danger"
+                            size="small" 
+                            style={{margin: "0 1rem"}}
+                        >
                             Delete
                         </Button>
                     </Popconfirm>
-                    
+                    <Button 
+                        size="small"
+                        onClick={()=>{
+                            modifyOne(record._id,{onSale: !record.onSale})
+                                .then(res=>{
+                                    loadData(currentPage )
+                                })
+                        }}
+                    >
+                        {record.onSale?"Offline":"Lanuch"}
+                    </Button>
                 </div>
             )
         }
@@ -87,10 +115,11 @@ export default function List(props) {
                 </Button>}>
             <Table 
                 rowKey="_id" 
+                rowClassName={record=>record.onSale?"bg-green":"bg-grey"}
                 columns={columns} 
                 bordered 
                 dataSource={dataSource}
-                pagination={{total,defaultPageSize:2, onChange:loadData}}
+                pagination={{defaultPageSize:4, total, onChange:loadData}}
 
             />
         </Card>

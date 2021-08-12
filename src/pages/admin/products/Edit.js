@@ -1,20 +1,32 @@
 import React,{useState,useEffect} from 'react'
 import {Form, Card, Input, Button} from 'antd'
-import { createApi,getOnebyId } from '../../../services/products';
+import { createApi,getOnebyId,modifyOne } from '../../../services/products';
 
 
 export default function Edit(props) {
 
     const onFinish = (values) =>{
         console.log('Success:', values);
-        createApi(values)
-            .then(res=>{
-                console.log(res)
-                props.history.push('/admin/products')
-            })
-            .catch(err=>{
-                console.log(err.response.data)
-            })
+        if(props.match.params.id){
+            modifyOne(props.match.params.id,values)
+                .then(res=>{
+                    console.log(res)
+                    props.history.push('/admin/products')
+                })
+                .catch(err=>{
+                    console.log(err.response.data)
+                })
+        }else{
+            createApi(values)
+                .then(res=>{
+                    console.log(res)
+                    props.history.push('/admin/products')
+                })
+                .catch(err=>{
+                    console.log(err.response.data)
+                })
+        }
+        
     }
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
@@ -60,7 +72,14 @@ export default function Edit(props) {
 
 
     return (
-        <Card title="Edit Products"> 
+        <Card 
+            title="Edit Products"
+            extra={
+                <Button onClick={() => props.history.push("/admin/products")}>
+                  Go back
+                </Button>
+              }
+        > 
             <Form form={form}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
