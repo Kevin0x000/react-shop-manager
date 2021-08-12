@@ -1,5 +1,6 @@
-import React from 'react'
+import React, {useEffect,useState} from 'react'
 import { Card, Table, Button, Popconfirm } from 'antd' 
+import { listApi } from '../../../services/products'
 
 export default function List(props) {
     const dataSource = [{
@@ -15,6 +16,16 @@ export default function List(props) {
         name:"p3",
         price:2.5
     }]
+
+    useEffect(() => {
+        listApi()
+        .then(res=>{
+            console.log(res)
+        })
+        
+    }, [])
+
+
     const columns = [{
         title:'Product ID',
         key:'id',
@@ -55,7 +66,7 @@ export default function List(props) {
                 <Button type="primary" size="small" onClick={()=>props.history.push('/admin/products/edit')} >
                     Add new
                 </Button>}>
-            <Table columns={columns} bordered dataSource={dataSource}/>
+            <Table rowKey="id" columns={columns} bordered dataSource={dataSource}/>
         </Card>
     )
 }

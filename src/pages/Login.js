@@ -1,19 +1,37 @@
 import React from 'react'
-import { Form, Input, Button, Checkbox, Card } from 'antd';
+import { Form, Input, Button, Checkbox, Card, message } from 'antd';
 import {setToken} from '../utils/auth'
+import { loginApi } from '../services/auth';
 import "./Login.css"
+
 
 
 export default function Login(props) {
 
     
-    const onFinish = (values: any) => {
-        console.log('Success:', values);
-        setToken(values.username)
-        props.history.push("/admin")
+    const onFinish = (values) => {
+        // console.log('Success:', values);
+        // setToken(values.username)
+        // props.history.push("/admin")
+        loginApi({
+            userName:values.username,
+            password:values.password
+        })
+            .then(res=>{
+                if(res.code ==='success'){
+                    message.success('Login successfully')
+                    setToken(res.token)
+                    props.history.push('/admin')
+                }else{
+                    message.info(res.message)
+                }
+            })
+            .catch(err=>{
+                message.error("User is not exist")
+            })
     }
     
-    const onFinishFailed = (errorInfo: any) => {
+    const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
     
