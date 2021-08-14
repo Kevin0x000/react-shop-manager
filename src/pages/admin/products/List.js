@@ -1,46 +1,48 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, } from 'react'
+import { connect } from 'react-redux'
+import { loadProduct } from '../../../store/actions/products'
 import { Card, Table, Button, Popconfirm } from 'antd'
-import { listApi, deleteOne, modifyOne } from '../../../services/products'
+import { deleteOne, modifyOne } from '../../../services/products'
 import { serverUrl } from '../../../utils/config'
 import './List.css'
 
-export default function List(props) {
-    // const dataSource = [{
-    //     id:1,
-    //     name:"p1",
-    //     price:5
-    // },{
-    //     id:2,
-    //     name:"p2",
-    //     price:89
-    // },{
-    //     id:3,
-    //     name:"p3",
-    //     price:2.5
-    // }]
+function List(props) {
+    console.log(props)
+    // const [dataSource, setDataSource] = useState([])
+    // const [total, setTotal] = useState(0)
+    // const [currentPage, setCurrentPage] = useState(1)
 
-    const [dataSource, setDataSource] = useState([])
-    const [total, setTotal] = useState(0)
-    const [currentPage, setCurrentPage] = useState(1)
+    // const loadData = (page) => {
+    //     listApi(page)
+    //         .then(res => {
+    //             setDataSource(res.products)
+    //             setTotal(res.totalCount)
+    //             setCurrentPage(page)
+    //         })
+    // }
 
-    const loadData = (page) => {
-        listApi(page)
-            .then(res => {
-                setDataSource(res.products)
-                setTotal(res.totalCount)
-                setCurrentPage(page)
+    const { list, page, total,dispatch } = props
+
+    
+    useEffect(() => {
+        dispatch(
+            loadProduct({
+                page: 1,
             })
+        )
+    }, [
+        dispatch
+    ])
+
+    const loadData = () => {
+        props.dispatch(
+            loadProduct({
+                page: page,
+            })
+        )
     }
 
-    useEffect(() => {
-        listApi()
-            .then(res => {
-                console.log(res)
-                setDataSource(res.products)
-                setTotal(res.totalCount)
-            })
 
-    }, [])
 
 
     const columns = [{
@@ -91,7 +93,7 @@ export default function List(props) {
                         onConfirm={() => {
                             deleteOne(record._id)
                                 .then(res => {
-                                    loadData(currentPage)
+                                    loadData()
                                 })
                         }
                         }
@@ -110,7 +112,7 @@ export default function List(props) {
                         onClick={() => {
                             modifyOne(record._id, { onSale: !record.onSale })
                                 .then(res => {
-                                    loadData(currentPage)
+                                    loadData()
                                 })
                         }}
                     >
@@ -132,10 +134,18 @@ export default function List(props) {
                 rowClassName={record => record.onSale ? "bg-green" : "bg-grey"}
                 columns={columns}
                 bordered
-                dataSource={dataSource}
-                pagination={{ defaultPageSize: 4, total, onChange: loadData }}
+                dataSource={list}
+                pagination={{
+                    defaultPageSize: 4, 
+                    total, 
+                    onChange: (p) => {
+                        props.dispatch(loadProduct({ page: p }))
+                    }
+                }}
 
             />
         </Card>
     )
 }
+
+export default connect(state => state.product)(List)
