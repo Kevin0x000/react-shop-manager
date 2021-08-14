@@ -1,10 +1,11 @@
 import React from 'react'
 import { withRouter} from "react-router-dom"
-import { Layout, Menu, Dropdown, message} from 'antd';
+import { Layout, Menu, Dropdown, Badge} from 'antd';
 import {CaretDownOutlined, UserOutlined} from '@ant-design/icons'
 import { clearToken } from '../../utils/auth';
 import shopLogo from './shop.png'
 import {adminRoutes} from '../../routes'
+import { connect } from 'react-redux';
 import './frame.css'
 
 
@@ -20,7 +21,9 @@ function index(props) {
         clearToken()
         props.history.push('/login')
       }else{
-        message.info(p.key)
+        if(p.key === "notify"){
+          props.history.push('/admin/notice')
+        }
       }
     }}>
       <Menu.Item key="notify">Noification Center</Menu.Item>
@@ -40,6 +43,7 @@ function index(props) {
             </Menu> */}
             <Dropdown overlay={menu}>
               <div className="adminspan">
+                <Badge dot={!props.isAllRead} />
                 <UserOutlined />&nbsp;
                 <span >Administrator</span>&nbsp;
                 <CaretDownOutlined />
@@ -64,7 +68,7 @@ function index(props) {
               })}
             </Menu>
           </Sider>
-          <Layout style={{ padding: '0 24px 24px' }}>
+          <Layout style={{ padding: '16px' }}>
             {/* <Breadcrumb style={{ margin: '16px 0' }}>
               <Breadcrumb.Item>Home</Breadcrumb.Item>
               <Breadcrumb.Item>List</Breadcrumb.Item>
@@ -73,9 +77,8 @@ function index(props) {
             <Content
               className="site-layout-background"
               style={{
-                padding: 24,
                 margin: 0,
-                minHeight: 280,
+                
               }}
             >
               {props.children}
@@ -86,4 +89,4 @@ function index(props) {
     )
 }
 
-export default withRouter(index)
+export default connect(state=>state)(withRouter(index));

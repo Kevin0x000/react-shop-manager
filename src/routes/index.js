@@ -3,33 +3,38 @@ import Edit from "../pages/admin/products/Edit"
 import List from "../pages/admin/products/List"
 import Login from "../pages/Login"
 import PageNotFound from "../pages/PageNotFound"
+import Notice from "../pages/admin/notices"
 
-import {ShopOutlined,AreaChartOutlined} from '@ant-design/icons'
+import { ShopOutlined, AreaChartOutlined } from '@ant-design/icons'
 
 
 export const mainRoutes = [{
-    path:'/login',
+    path: '/login',
     component: Login
-},{
+}, {
     path: '/404',
-    component : PageNotFound
+    component: PageNotFound
 }]
 
 export const adminRoutes = [{
-    path:'/admin/dashboard',
+    path: '/admin/dashboard',
     component: index,
-    isShow:true,
+    isShow: true,
     title: "Watch board",
     icon: <AreaChartOutlined />,
-},{
-    path:'/admin/products',
+}, {
+    path: '/admin/products',
     component: List,
     exact: true,
-    isShow:true,
-    title:"Product Management",
+    isShow: true,
+    title: "Product Management",
     icon: <ShopOutlined />,
-},{
-    path:'/admin/products/edit/:id?',
+}, {
+    path: '/admin/products/edit/:id?',
     component: Edit,
-    isShow:false,
+    isShow: false,
+}, {
+    path: '/admin/notice',
+    component: Notice,
+    isShow: false,
 }]

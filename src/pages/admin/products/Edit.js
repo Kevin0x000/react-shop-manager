@@ -4,13 +4,15 @@ import { createApi, getOnebyId, modifyOne } from '../../../services/products';
 import { serverUrl } from '../../../utils/config';
 import { Upload } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import BraftEditor from 'braft-editor';
+import 'braft-editor/dist/index.css'
 
 export default function Edit(props) {
 
     const onFinish = (values) => {
         console.log('Success:', values);
         if (props.match.params.id) {
-            modifyOne(props.match.params.id, { ...values, coverImg: imageUrl })
+            modifyOne(props.match.params.id, { ...values, coverImg: imageUrl,content: editorState.toHTML()})
                 .then(res => {
                     console.log(res)
                     props.history.push('/admin/products')
@@ -19,7 +21,7 @@ export default function Edit(props) {
                     console.log(err.response.data)
                 })
         } else {
-            createApi({ ...values, coverImg: imageUrl })
+            createApi({ ...values, coverImg: imageUrl,content: editorState.toHTML() })
                 .then(res => {
                     console.log(res)
                     props.history.push('/admin/products')
@@ -34,6 +36,14 @@ export default function Edit(props) {
         console.log('Failed:', errorInfo);
     };
 
+    //rich text editor
+    const [editorState, setEditorState] = useState(BraftEditor.createEditorState())
+    const handleEditorChange = (editorState) => {
+        setEditorState(editorState)
+    }
+
+
+    // upload image
     const [imageUrl, setImageUrl] = useState('')
     const [loading, setLoading] = useState(false)
 
@@ -63,6 +73,7 @@ export default function Edit(props) {
 
     const [currentData, setCurrentData] = useState({})
     const [form] = Form.useForm()
+    
     //excute when init
     useEffect(() => {
 
@@ -72,16 +83,18 @@ export default function Edit(props) {
                 price: currentData.price,
             })
             getOnebyId(props.match.params.id)
-                .then(res => {
+                .then(res => { //server responesed data
                     setCurrentData(res)
                     setImageUrl(res.coverImg);
+                    setEditorState(BraftEditor.createEditorState(res.content))
                 })
 
         }
-    }, [currentData.name,
-    currentData.price,
+    }, [
+        currentData.name,
+        currentData.price,
         form,
-    props.match.params.id
+        props.match.params.id
     ])
 
 
@@ -149,6 +162,12 @@ export default function Edit(props) {
                     >
                         {imageUrl ? <img src={serverUrl + imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
                     </Upload>
+                </Form.Item>
+                <Form.Item label="Details">
+                    <BraftEditor
+                        value={editorState}
+                        onChange={(e) => handleEditorChange(e)}
+                    />l
                 </Form.Item>
                 <Form.Item><Button type="primary" htmlType="submit">Save</Button></Form.Item>
             </Form>
